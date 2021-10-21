@@ -51,51 +51,62 @@ def getTrackName(playback):
 def getArtistName(playback):
     return playback['item']['artists'][0]['name']
 
+# get the spotify ID of the current track
 def getTrackId(playback):
     return playback['item']['id']
 
+# returns URL of image with the highest resolution
 def getAlbumArtUrl(playback):
-    return next(image for image in playback['item']['album']['images'] if image['height'] == 64)['url']
+    return playback['item']['album']['images'].sort(key=lambda x:x["height"], reverse=True)[0]['url']   
 
+# get image for the currently playing song
 def getAlbumArt(playback):
     url = getAlbumArtUrl(playback)
     content = requests.get(url, stream=True).content
     image = Image.open(io.BytesIO(content))
     return image
 
+# save image to disk
 def saveImage(image):
     image.save("albumart.jpg")
 
+# show screensaver
 def screensaver():
-    os.system('./send-image -h localhost:1337 -g 64x64 snorlax.png')
+    sendSavedImage("snorlax.png")
 
+# send saved image to flaschen-taschen
+# will fail if flaschen-taschen is not installed
+def sendSavedImage(imageFileName):
+    try:
+        os.system('./send-image -h localhost:1337 -g 64x64 {imageFileName}')
+    except:
+        print("send-image not available, is flaschen-taschen installed?")
+
+showScreensaver = True
+
+# actual routine begins here
+print("creating Spotify login")
 spotify = getSpotifyAuth()
-
-showingNothing = False
-
+print("done creating Spotify login")
 while True:
     try:
         playback = spotify.current_playback()
-        if(playback==None):
+        if(playback == None):
             print("nothing is playing")
-            if(showingNothing == False):
-                showingNothing=True
+            if(showScreensaver == True):
+                showScreensaver = False
                 screensaver()
         else:
-            showingNothing=False
+            showScreensaver=False
             id = getTrackId(playback)
             if id != lastPlayedTrack:
-                plt.draw()
                 lastPlayedTrack = id
                 trackName = getTrackName(playback)
                 artist = getArtistName(playback)
                 print(f"currently playing: {trackName} by {artist}")
                 image = getAlbumArt(playback)
                 saveImage(image)
-                try:
-                    os.system('./send-image -h localhost:1337 -g 64x64 albumart.jpg')
-                except:
-                    print("send-image not available, is flaschen-taschen installed?")
+                sendSavedImage("albumart.jpg")
     except BaseException:
         screensaver()
     time.sleep(1)
