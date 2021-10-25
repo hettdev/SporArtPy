@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 secrets.json
 spotifyCache
-aa.jpg
+screensaverPictures/*
