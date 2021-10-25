@@ -1,18 +1,15 @@
 import io
 import os
-import errno
 from requests.api import options, request
 import spotipy
-from spotipy import cache_handler
 from spotipy.oauth2 import SpotifyOAuth
 import json
 import os.path
 import time
 import requests
 from PIL import Image
-import matplotlib.pyplot as plt
-
-lastPlayedTrack = ''
+from datetime import datetime, timedelta
+import random
 
 def getSpotifyAuth():
     redirectUrl = "https://example.com/callback"
@@ -57,7 +54,8 @@ def getTrackId(playback):
 
 # returns URL of image with the highest resolution
 def getAlbumArtUrl(playback):
-    return playback['item']['album']['images'].sort(key=lambda x:x["height"], reverse=True)[0]['url']   
+    sortedImages = sorted(playback['item']['album']['images'], key=lambda x:x["height"], reverse=True)
+    return sortedImages[0]['url']   
 
 # get image for the currently playing song
 def getAlbumArt(playback):
@@ -70,34 +68,45 @@ def getAlbumArt(playback):
 def saveImage(image):
     image.save("albumart.jpg")
 
+timeStamp = datetime.now()
 # show screensaver
 def screensaver():
     sendSavedImage("snorlax.png")
+    return
+    currentTime = datetime.now()
+    global timeStamp 
+    timeDifference = currentTime - timeStamp
+    if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture):
+        num = random.randint(0,250)
+        timeStamp = currentTime
+        #print(f"screensaverPictures/{num}.png")
+        sendSavedImage(f"screensaverPictures/{num}.png")
 
 # send saved image to flaschen-taschen
 # will fail if flaschen-taschen is not installed
 def sendSavedImage(imageFileName):
     try:
-        os.system('./send-image -h localhost:1337 -g 64x64 {imageFileName}')
+        os.system(f'./send-image -h localhost:1337 -g 64x64 {imageFileName}')
     except:
         print("send-image not available, is flaschen-taschen installed?")
 
-showScreensaver = True
+random.seed(4388)
+secondsUntilNextScreensaverPicture = 5
+lastPlayedTrack = ''
+screensaverCurrentlyShown = False
 
 # actual routine begins here
-print("creating Spotify login")
 spotify = getSpotifyAuth()
-print("done creating Spotify login")
 while True:
     try:
         playback = spotify.current_playback()
         if(playback == None):
             print("nothing is playing")
-            if(showScreensaver == True):
-                showScreensaver = False
+            if(screensaverCurrentlyShown == False):
+                screensaverCurrentlyShown = True
                 screensaver()
         else:
-            showScreensaver=False
+            screensaverCurrentlyShown = False
             id = getTrackId(playback)
             if id != lastPlayedTrack:
                 lastPlayedTrack = id
@@ -107,6 +116,7 @@ while True:
                 image = getAlbumArt(playback)
                 saveImage(image)
                 sendSavedImage("albumart.jpg")
-    except BaseException:
+    except BaseException as err:
+        print(err)
         screensaver()
     time.sleep(1)
