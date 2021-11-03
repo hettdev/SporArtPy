@@ -8,4 +8,4 @@
     --led-brightness=80 \
     --led-limit-refresh=200 \
     --led-pixel-mapper="Rotate:180" \
-    --led-slowdown-gpio=0
+    --led-slowdown-gpio=1

@@ -1,5 +1,7 @@
 import io
 import os
+from os import listdir
+from os.path import isfile, join
 from requests.api import options, request
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -71,16 +73,16 @@ def saveImage(image):
 timeStamp = datetime.now()
 # show screensaver
 def screensaver():
-    sendSavedImage("snorlax.png")
-    return
     currentTime = datetime.now()
     global timeStamp 
     timeDifference = currentTime - timeStamp
     if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture):
-        num = random.randint(0,250)
+        allFiles = [f for f in listdir("screenSaverPictures") if isfile(join("screenSaverPictures", f))]    
+        num = random.randint(0,len(allFiles)-1)
         timeStamp = currentTime
         #print(f"screensaverPictures/{num}.png")
-        sendSavedImage(f"screensaverPictures/{num}.png")
+        screensaverPicture = allFiles[num]
+        sendSavedImage(screensaverPicture)
 
 # send saved image to flaschen-taschen
 # will fail if flaschen-taschen is not installed
