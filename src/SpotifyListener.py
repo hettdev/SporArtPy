@@ -12,7 +12,19 @@ import requests
 from PIL import Image
 from datetime import datetime, timedelta
 import random
+import threading
 
+# global variables
+brightness = 80 # default brightness
+random.seed(4388)
+secondsUntilNextScreensaverPicture = 5
+lastPlayedTrack = ''
+screensaverCurrentlyShown = False
+birghtnessServerUrl = "http://192.168.178.12:5000/api/brightness/"
+threadLock = threading.Lock()
+albumart = "albumart.jpg"
+
+# functions
 def getSpotifyAuth():
     redirectUrl = "https://example.com/callback"
     fileName = "./secrets.json"
@@ -68,7 +80,11 @@ def getAlbumArt(playback):
 
 # save image to disk
 def saveImage(image):
-    image.save("albumart.jpg")
+    threadLock.acquire()
+    try:
+        image.save("albumart.jpg")
+    finally:
+        threadLock.release()
 
 timeStamp = datetime.now()
 # show screensaver
@@ -82,23 +98,41 @@ def screensaver():
         timeStamp = currentTime
         #print(f"screensaverPictures/{num}.png")
         screensaverPicture = allFiles[num]
-        sendSavedImage(screensaverPicture)
+        sendSavedImage(f"screenSaverPictures/{screensaverPicture}")
 
 # send saved image to flaschen-taschen
 # will fail if flaschen-taschen is not installed
 def sendSavedImage(imageFileName):
+    threadLock.acquire()
     try:
-        os.system(f'./send-image -h localhost:1337 -g 64x64 {imageFileName}')
+        os.system(f'./send-image -h localhost:1337 -g 64x64 {imageFileName} -b {brightness}')
+        print(brightness)
     except:
         print("send-image not available, is flaschen-taschen installed?")
+    finally:
+        threadLock.release()
 
-random.seed(4388)
-secondsUntilNextScreensaverPicture = 5
-lastPlayedTrack = ''
-screensaverCurrentlyShown = False
+def getServerBrightness():
+    try:
+        req = requests.get(birghtnessServerUrl, timeout=3)
+        if(req.status_code == 200):
+            return req.content
+    except:
+        return brightness
+
+def serverBrightnessThreadFunction():
+    global brightness
+    while True:
+        newBrightness = int(getServerBrightness())
+        if (newBrightness != brightness):
+            brightness=newBrightness
+            sendSavedImage(albumart)
+        time.sleep(0.016)
 
 # actual routine begins here
 spotify = getSpotifyAuth()
+brightnessThread = threading.Thread(target=serverBrightnessThreadFunction, daemon=True)
+brightnessThread.start()
 while True:
     try:
         playback = spotify.current_playback()
@@ -117,7 +151,7 @@ while True:
                 print(f"currently playing: {trackName} by {artist}")
                 image = getAlbumArt(playback)
                 saveImage(image)
-                sendSavedImage("albumart.jpg")
+                sendSavedImage(albumart)
     except BaseException as err:
         print(err)
         screensaver()
