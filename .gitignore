@@ -130,3 +130,15 @@ dmypy.json
 secrets.json
 spotifyCache
 screensaverPictures/*
+*.suo
+*.v2
+/src/BrightnessController/bin/Debug/net5.0
+/src/BrightnessController/obj
+/src/BrightnessController.App/BrightnessController.App/bin/Debug/netstandard2.0
+/src/BrightnessController.App/BrightnessController.App/obj
+/src/BrightnessController/brightnessStorage
+/src/BrightnessController.App/BrightnessController.App.Android/bin/Debug
+/src/BrightnessController.App/BrightnessController.App.Android/obj
+/src/albumart.jpg
+/case.stl
+/case.blend1
