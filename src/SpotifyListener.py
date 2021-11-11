@@ -17,7 +17,7 @@ import threading
 # global variables
 brightness = 80 # default brightness
 random.seed(4388)
-secondsUntilNextScreensaverPicture = 5
+secondsUntilNextScreensaverPicture = 300
 lastPlayedTrack = ''
 screensaverCurrentlyShown = False
 birghtnessServerUrl = "http://192.168.178.12:5000/api/brightness/"
@@ -94,7 +94,7 @@ def screensaver():
     global timeStamp 
     global imageToShow
     timeDifference = currentTime - timeStamp
-    if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture):
+    if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture) or imageToShow == albumart:
         allFiles = [f for f in listdir("screenSaverPictures") if isfile(join("screenSaverPictures", f))]    
         num = random.randint(0,len(allFiles)-1)
         timeStamp = currentTime
@@ -142,9 +142,7 @@ while True:
         if(playback == None):
             print(f"{datetime.now()}: nothing is playing")
             lastPlayedTrack = ''
-            if(screensaverCurrentlyShown == False):
-                screensaverCurrentlyShown = True
-                screensaver()
+            screensaver()
         else:
             screensaverCurrentlyShown = False
             id = getTrackId(playback)
