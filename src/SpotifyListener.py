@@ -13,22 +13,17 @@ from PIL import Image
 from datetime import datetime, timedelta
 import random
 import threading
-import subprocess
-import signal
 
 # global variables
-brightness = 78 # default brightness
-random.seed(datetime.now().second)
-#random.seed(4388)
-secondsUntilNextScreensaverPicture = 3600
+brightness = 80 # default brightness
+random.seed(4388)
+secondsUntilNextScreensaverPicture = 300
 lastPlayedTrack = ''
 screensaverCurrentlyShown = False
-birghtnessServerUrl = "http://192.168.178.12:5000/api/brightness/"
+birghtnessServerUrl = "http://localhost:5000/api/brightness/"
 threadLock = threading.Lock()
 albumart = "albumart.jpg"
 imageToShow = albumart
-screensaverPath = "screenSaverPictures/gifs"
-sendImageProcess = None
 
 # functions
 def getSpotifyAuth():
@@ -75,7 +70,7 @@ def getTrackId(playback):
 # returns URL of image with the highest resolution
 def getAlbumArtUrl(playback):
     sortedImages = sorted(playback['item']['album']['images'], key=lambda x:x["height"], reverse=True)
-    return sortedImages[0]['url']
+    return sortedImages[0]['url']   
 
 # get image for the currently playing song
 def getAlbumArt(playback):
@@ -96,33 +91,27 @@ timeStamp = datetime.now()
 # show screensaver
 def screensaver():
     currentTime = datetime.now()
-    global timeStamp
+    global timeStamp 
     global imageToShow
     timeDifference = currentTime - timeStamp
     if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture) or imageToShow == albumart:
-        allFiles = [f for f in listdir(screensaverPath) if isfile(join(screensaverPath, f))]
+        allFiles = [f for f in listdir("screenSaverPictures") if isfile(join("screenSaverPictures", f))]    
         num = random.randint(0,len(allFiles)-1)
         timeStamp = currentTime
         #print(f"screensaverPictures/{num}.png")
         screensaverPicture = allFiles[num]
-        imageToShow = f"{screensaverPath}/{screensaverPicture}"
+        imageToShow = f"screenSaverPictures/{screensaverPicture}"
         sendSavedImage()
 
 # send saved image to flaschen-taschen
 # will fail if flaschen-taschen is not installed
 def sendSavedImage():
     threadLock.acquire()
-    global sendImageProcess
     try:
-        # os.system(f'./send-image -h localhost:1337 -g 64x64 {imageToShow} -b {brightness}')
-        if(sendImageProcess != None):
-            sendImageProcess.send_signal(signal.SIGINT)
-        cmd = ['./send-image', '-h', 'localhost:1337', '-g', '64x64', imageToShow, '-b', str(brightness)]
-        sendImageProcess = subprocess.Popen(args=cmd, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.system(f'./send-image -h localhost:1337 -g 64x64 {imageToShow} -b {brightness}')
         print(brightness)
-    except BaseException as err:
+    except:
         print("send-image not available, is flaschen-taschen installed?")
-        print(err)
     finally:
         threadLock.release()
 
