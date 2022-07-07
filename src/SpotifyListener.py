@@ -17,12 +17,13 @@ import threading
 # global variables
 brightness = 80 # default brightness
 random.seed(4388)
-secondsUntilNextScreensaverPicture = 5
+secondsUntilNextScreensaverPicture = 300
 lastPlayedTrack = ''
 screensaverCurrentlyShown = False
 birghtnessServerUrl = "http://192.168.178.12:5000/api/brightness/"
 threadLock = threading.Lock()
 albumart = "albumart.jpg"
+imageToShow = albumart
 
 # functions
 def getSpotifyAuth():
@@ -91,21 +92,23 @@ timeStamp = datetime.now()
 def screensaver():
     currentTime = datetime.now()
     global timeStamp 
+    global imageToShow
     timeDifference = currentTime - timeStamp
-    if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture):
+    if timeDifference > timedelta(seconds=secondsUntilNextScreensaverPicture) or imageToShow == albumart:
         allFiles = [f for f in listdir("screenSaverPictures") if isfile(join("screenSaverPictures", f))]    
         num = random.randint(0,len(allFiles)-1)
         timeStamp = currentTime
         #print(f"screensaverPictures/{num}.png")
         screensaverPicture = allFiles[num]
-        sendSavedImage(f"screenSaverPictures/{screensaverPicture}")
+        imageToShow = f"screenSaverPictures/{screensaverPicture}"
+        sendSavedImage()
 
 # send saved image to flaschen-taschen
 # will fail if flaschen-taschen is not installed
-def sendSavedImage(imageFileName):
+def sendSavedImage():
     threadLock.acquire()
     try:
-        os.system(f'./send-image -h localhost:1337 -g 64x64 {imageFileName} -b {brightness}')
+        os.system(f'./send-image -h localhost:1337 -g 64x64 {imageToShow} -b {brightness}')
         print(brightness)
     except:
         print("send-image not available, is flaschen-taschen installed?")
@@ -126,7 +129,7 @@ def serverBrightnessThreadFunction():
         newBrightness = int(getServerBrightness())
         if (newBrightness != brightness):
             brightness=newBrightness
-            sendSavedImage(albumart)
+            sendSavedImage()
         time.sleep(0.016)
 
 # actual routine begins here
@@ -137,10 +140,9 @@ while True:
     try:
         playback = spotify.current_playback()
         if(playback == None):
-            print("nothing is playing")
-            if(screensaverCurrentlyShown == False):
-                screensaverCurrentlyShown = True
-                screensaver()
+            print(f"{datetime.now()}: nothing is playing")
+            lastPlayedTrack = ''
+            screensaver()
         else:
             screensaverCurrentlyShown = False
             id = getTrackId(playback)
@@ -151,7 +153,8 @@ while True:
                 print(f"currently playing: {trackName} by {artist}")
                 image = getAlbumArt(playback)
                 saveImage(image)
-                sendSavedImage(albumart)
+                imageToShow = albumart
+                sendSavedImage()
     except BaseException as err:
         print(err)
         screensaver()
