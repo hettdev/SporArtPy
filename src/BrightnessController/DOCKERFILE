@@ -2,7 +2,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7 AS base
 WORKDIR /app
 EXPOSE 80
 
+<<<<<<< HEAD
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim-arm32v7 AS build
+=======
+FROM mcr.microsoft.com/dotnet/sdk:5.0-arm32v7 AS build
+>>>>>>> 0cc300a6b865bc7b0a9def89047346ec165254c5
 WORKDIR /src
 COPY ["src/BrightnessController/BrightnessController.csproj", "BrightnessController/"]
 RUN dotnet restore "BrightnessController/BrightnessController.csproj"
