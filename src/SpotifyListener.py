@@ -20,7 +20,7 @@ random.seed(4388)
 secondsUntilNextScreensaverPicture = 300
 lastPlayedTrack = ''
 screensaverCurrentlyShown = False
-birghtnessServerUrl = "http://192.168.178.12:5000/api/brightness/"
+birghtnessServerUrl = "http://localhost:5000/api/brightness/"
 threadLock = threading.Lock()
 albumart = "albumart.jpg"
 imageToShow = albumart
