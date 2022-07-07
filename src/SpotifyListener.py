@@ -2,7 +2,6 @@ import io
 import os
 from os import listdir
 from os.path import isfile, join
-from requests.api import options, request
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import json
@@ -23,7 +22,7 @@ random.seed(datetime.now().second)
 secondsUntilNextScreensaverPicture = 3600
 lastPlayedTrack = ''
 screensaverCurrentlyShown = False
-birghtnessServerUrl = "http://192.168.178.12:5000/api/brightness/"
+birghtnessServerUrl = "http://localhost:5000/api/brightness/"
 threadLock = threading.Lock()
 albumart = "albumart.jpg"
 imageToShow = albumart
