@@ -30,3 +30,6 @@ For my usecase this runs on the same Raspi as the python script.
 Flutter app for sending brightness change requests to the server.  
 IP is hardcoded to fit with my local network setup - change if needed.
 
+
+https://user-images.githubusercontent.com/6205477/178051174-5d4dbac5-4de8-4d1e-b692-94b98b012b92.mp4
+[Voidsailor - Transistor](https://open.spotify.com/album/1YsEAYZGJ0qzLmqXOXdh3f)
