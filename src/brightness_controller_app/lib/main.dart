@@ -101,7 +101,7 @@ class _BrightnessSliderState extends State<BrightnessSlider> {
     try {
       var _body = jsonEncode(val);
       return await http.post(
-        Uri.parse('http://localhost:5000/api/brightness/'),
+        Uri.parse('http://192.168.178.14:5000/api/brightness/'),
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -117,7 +117,7 @@ class _BrightnessSliderState extends State<BrightnessSlider> {
   Future<String> getBrightnessFromServer() async {
     try {
       var result = await http.get(
-        Uri.parse('http://localhost:5000/api/brightness/'),
+        Uri.parse('http://192.168.178.14:5000/api/brightness/'),
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Accept': 'application/json',
