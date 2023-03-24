@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim-arm32v7 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["src/BrightnessController/BrightnessController.csproj", "BrightnessController/"]
 RUN dotnet restore "BrightnessController/BrightnessController.csproj"
@@ -11,7 +11,7 @@ WORKDIR "/src/BrightnessController"
 RUN dotnet build "BrightnessController.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "BrightnessController.csproj" -c Release -o /app/publish
+RUN dotnet publish "BrightnessController.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

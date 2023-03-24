@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightnessController", "src\BrightnessController\BrightnessController.csproj", "{E56E52DD-BCA4-4434-81A3-2251EE197C5A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightnessController.App", "src\BrightnessController.App\BrightnessController.App\BrightnessController.App.csproj", "{EAE1650D-0A04-43B5-8C1B-749593757E4C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightnessController.App.Android", "src\BrightnessController.App\BrightnessController.App.Android\BrightnessController.App.Android.csproj", "{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,16 +15,6 @@ Global
 		{E56E52DD-BCA4-4434-81A3-2251EE197C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E56E52DD-BCA4-4434-81A3-2251EE197C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E56E52DD-BCA4-4434-81A3-2251EE197C5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EAE1650D-0A04-43B5-8C1B-749593757E4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAE1650D-0A04-43B5-8C1B-749593757E4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAE1650D-0A04-43B5-8C1B-749593757E4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAE1650D-0A04-43B5-8C1B-749593757E4C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0877C3C8-D5B6-4BFB-9EE5-2E9FA5285A9C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
