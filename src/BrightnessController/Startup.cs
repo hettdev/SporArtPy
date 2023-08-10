@@ -44,7 +44,8 @@ namespace BrightnessController
             {
                 configuration.WriteTo.Console();
                 configuration.Enrich.FromLogContext();
-                configuration.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
+                bool.TryParse(Configuration.GetValue<string>("IsDebug"), out var debug);
+                configuration.MinimumLevel.Override("Microsoft.AspNetCore", debug ? LogEventLevel.Debug : LogEventLevel.Warning);
             });
         }
 

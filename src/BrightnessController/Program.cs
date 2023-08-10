@@ -22,19 +22,34 @@ namespace BrightnessController
                 .WriteTo.Console()
                 .CreateBootstrapLogger();
             string token = "";
+            bool isDebug = false;
             if(args.Length >= 2) 
             {
-                if (args[0] == "--token" || args[0] == "-t")
+                var argList = args.ToList();
+                var tokenIdx = argList.IndexOf("--token");
+                if (tokenIdx >= 0)
                 {
                     Log.Information("Token passed");
-                    token = args[1];
+                    token = args[tokenIdx+1];
                 }
                 else
                 {
-                    Log.Error("No valid arguments parsed");
-                    Log.Information("Valid Arguments are:");
-                    Log.Information("-t|--token\tTo pass an Authtoken");
+                    tokenIdx = argList.IndexOf("-t");
+                    if (tokenIdx >= 0)
+                    {
+                        Log.Information("Token passed");
+                        token = args[tokenIdx+1];
+                    }
+                    else
+                    {
+                        Log.Error("No valid arguments parsed");
+                        Log.Information("Valid Arguments are:");
+                        Log.Information("-t|--token\tTo pass an Authtoken");
+                        Log.Information($"Passed Arguments: {string.Join('|', args)}");
+                    }
                 }
+
+                isDebug = args.Any(arg => arg == "--debug");
             }  
             else
             {
@@ -50,6 +65,7 @@ namespace BrightnessController
                 .ConfigureServices((ctx, services) =>
                 {
                     ctx.Configuration["AuthToken"] = token;
+                    ctx.Configuration["IsDebug"] = isDebug.ToString();
                 })
                 .UseSerilog()
                 .Build();

@@ -50,8 +50,8 @@ namespace BrightnessController
         {
             try
             {
-                var intValue = (int)brightness;
-                _logger.Information($"Brightness POST: {intValue.ToString()}");
+                _logger.Information($"Brightness POST: {brightness.ToString()}");
+                var intValue = (int)(brightness / 2.55);
                 if (!IsAuthorized())
                 {
                     _logger.Information($"provided auth token {Request.Headers.Authorization} did not match expected token");
