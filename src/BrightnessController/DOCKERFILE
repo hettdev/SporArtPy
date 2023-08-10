@@ -1,17 +1,19 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-preview AS build
+ARG TARGETARCH
 WORKDIR /src
+
 COPY ["src/BrightnessController/BrightnessController.csproj", "BrightnessController/"]
-RUN dotnet restore "BrightnessController/BrightnessController.csproj"
+RUN dotnet restore "BrightnessController/BrightnessController.csproj" -a $TARGETARCH
 COPY ./src .
 WORKDIR "/src/BrightnessController"
-RUN dotnet build "BrightnessController.csproj" -c Release -o /app/build
+RUN dotnet build "BrightnessController.csproj" -c Release -o /app/build -a $TARGETARCH
 
 FROM build AS publish
-RUN dotnet publish "BrightnessController.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BrightnessController.csproj" -c Release -o /app/publish /p:UseAppHost=false -a $TARGETARCH
 
 FROM base AS final
 WORKDIR /app
