@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
+using BrightnessController.Models;
+using ImTools;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace BrightnessController
 {
@@ -11,10 +15,14 @@ namespace BrightnessController
     {
         private readonly ILocalStorage _localStorage;
         private readonly string _authToken;
+        private readonly ILogger _logger;
+        private readonly IHostEnvironment _environment;
 
-        public BrightnessController(ILocalStorage localStorage, IConfiguration config)
+        public BrightnessController(ILocalStorage localStorage, IConfiguration config, ILogger logger, IHostEnvironment environment)
         {
             _localStorage = localStorage;
+            _logger = logger;
+            _environment = environment;
             _authToken = config["AuthToken"] ?? "";
         }
 
@@ -23,7 +31,7 @@ namespace BrightnessController
         {
             if (!IsAuthorized())
             {
-                Console.WriteLine($"provided auth token {Request.Headers.Authorization} did not match expected token");
+                _logger.Information($"provided auth token {Request.Headers.Authorization} did not match expected token");
                 return Unauthorized();
             }
             try
@@ -38,16 +46,18 @@ namespace BrightnessController
         }
 
         [HttpPost]
-        public async Task<ActionResult> Set([FromBody] int brightness)
+        public async Task<ActionResult> Set([FromBody] double brightness)
         {
-            if (!IsAuthorized())
-            {
-                Console.WriteLine($"provided auth token {Request.Headers.Authorization} did not match expected token");
-                return Unauthorized();
-            }
             try
             {
-                await _localStorage.StoreBrightness(brightness);
+                var intValue = (int)brightness;
+                _logger.Information($"Brightness POST: {intValue.ToString()}");
+                if (!IsAuthorized())
+                {
+                    _logger.Information($"provided auth token {Request.Headers.Authorization} did not match expected token");
+                    return Unauthorized();
+                }
+                await _localStorage.StoreBrightness(intValue);
                 return Ok();
             }
             catch (Exception ex)
@@ -58,8 +68,10 @@ namespace BrightnessController
 
         private bool IsAuthorized()
         {
-            return !string.IsNullOrEmpty(_authToken)
-                && Request.Headers.Authorization == _authToken;
+            return
+                _environment.IsDevelopment()
+                || (!string.IsNullOrEmpty(_authToken)
+                    && Request.Headers.Authorization == _authToken);
         }
     }
 
